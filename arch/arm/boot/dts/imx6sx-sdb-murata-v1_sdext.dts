@@ -1,0 +1,138 @@
+/*
+ * Copyright (C) 2014-2015 Freescale Semiconductor, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ */
+
+/* NOTE: This DTS file is written for plugging in Murata Wi-Fi/BT EVK into SD3 slot using Murata */
+/* i.MX InterConnect Ver 1.0 Adapter with SD Card Extender in SD2 slot. Bluetooth UART connects via */
+/* SD3 EMMC/MMC Plus pinout. WL_REG_ON/BT_REG_ON/WL_HOST_WAKE connect via SD Card Extender. */
+/* ==> No hardware modification to i.MX 6SoloX is required. */
+#include "imx6sx-sdb.dts"
+
+/ {
+	regulators {
+		/* Murata -- add wlreg_on definition */
+		wlreg_on: fixedregulator@100 {
+			compatible = "regulator-fixed";
+			regulator-min-microvolt = <5000000>;
+			regulator-max-microvolt = <5000000>;
+			regulator-name = "wlreg_on";
+			gpio = <&gpio6 10 0>; /* WL_REG_ON: SD2_DAT2 (gpio6 10) */
+			startup-delay-us = <100>; /* WL_REG_ON needs 61 usec delay */  
+			enable-active-high;
+		};
+	};
+
+	/* Murata -- define hook for BCMDHD driver.   */
+	/* WL_HOST_WAKE is defined below -- connected via SD Card Extender on SD2 slot. */
+	bcmdhd_wlan_0: bcmdhd_wlan@0 {
+		compatible = "android,bcmdhd_wlan";
+		/* WL_HOST_WAKE: SD2_DAT1 (gpio6 9) */
+		gpio = <&gpio6 9 0>;
+		wlreg_on-supply = <&wlreg_on>;
+	};
+};
+
+&iomuxc {
+	imx6sx-sdb-murata-v1_sdext {
+		/* Murata: MUX UART3 on SD3 connection */
+		pinctrl_uart3: uart3grp {
+			fsl,pins = <
+				MX6SX_PAD_SD3_DATA4__UART3_RX		0x1b0b1	
+				MX6SX_PAD_SD3_DATA5__UART3_TX		0x1b0b1	
+				MX6SX_PAD_SD3_DATA7__UART3_CTS_B	0x1b0b1	
+				MX6SX_PAD_SD3_DATA6__UART3_RTS_B	0x1b0b1	
+			>;
+		};
+
+		/* Murata: change MUXing on SD2 slot for control signals. */
+		pinctrl_usdhc2_1: usdhc2grp-1 {
+			fsl,pins = <
+				MX6SX_PAD_SD2_CMD__USDHC2_CMD		0x17059
+				MX6SX_PAD_SD2_CLK__USDHC2_CLK		0x10059
+				MX6SX_PAD_SD2_DATA0__USDHC2_DATA0	0x17059
+				MX6SX_PAD_SD2_DATA1__GPIO6_IO_9		0x17059 /* WL_HOST_WAKE -- default: 0x13069 for low pulldown */
+				MX6SX_PAD_SD2_DATA2__GPIO6_IO_10	0x13069 /* WL_REG_ON */
+				MX6SX_PAD_SD2_DATA3__GPIO6_IO_11	0x13069 /* BT_REG_ON */
+			>;
+		};
+
+		/* Murata change SD3 to 4-bit SDIO only; use upper 4-bits for UART. */
+		pinctrl_usdhc3_1: usdhc3grp-1 {
+			fsl,pins = <
+				MX6SX_PAD_SD3_CMD__USDHC3_CMD		0x17069
+				MX6SX_PAD_SD3_CLK__USDHC3_CLK		0x10071
+				MX6SX_PAD_SD3_DATA0__USDHC3_DATA0	0x17069
+				MX6SX_PAD_SD3_DATA1__USDHC3_DATA1	0x17069
+				MX6SX_PAD_SD3_DATA2__USDHC3_DATA2	0x17069
+				MX6SX_PAD_SD3_DATA3__USDHC3_DATA3	0x17069
+				MX6SX_PAD_KEY_COL0__GPIO2_IO_10		0x17059 /* CD */
+				MX6SX_PAD_KEY_ROW0__GPIO2_IO_15		0x17059 /* WP */
+			>;
+		};
+
+		pinctrl_usdhc3_1_100mhz: usdhc3grp-1-100mhz {
+			fsl,pins = <
+				MX6SX_PAD_SD3_CMD__USDHC3_CMD		0x170b9
+				MX6SX_PAD_SD3_CLK__USDHC3_CLK		0x100b9
+				MX6SX_PAD_SD3_DATA0__USDHC3_DATA0	0x170b9
+				MX6SX_PAD_SD3_DATA1__USDHC3_DATA1	0x170b9
+				MX6SX_PAD_SD3_DATA2__USDHC3_DATA2	0x170b9
+				MX6SX_PAD_SD3_DATA3__USDHC3_DATA3	0x170b9
+			>;
+		};
+
+		pinctrl_usdhc3_1_200mhz: usdhc3grp-1-200mhz {
+			fsl,pins = <
+				MX6SX_PAD_SD3_CMD__USDHC3_CMD		0x170f9
+				MX6SX_PAD_SD3_CLK__USDHC3_CLK		0x100f9
+				MX6SX_PAD_SD3_DATA0__USDHC3_DATA0	0x170f9
+				MX6SX_PAD_SD3_DATA1__USDHC3_DATA1	0x170f9
+				MX6SX_PAD_SD3_DATA2__USDHC3_DATA2	0x170f9
+				MX6SX_PAD_SD3_DATA3__USDHC3_DATA3	0x170f9
+			>;
+		};
+	}; 
+};
+
+/* Murata mod: for 4-wire Bluetooth UART connection. */
+&uart3 {  
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_uart3>;
+	fsl,uart-has-rtscts;	/* Murata -- for 4-wire configuration only */
+	status = "okay";
+};
+
+/* Keeps slot powered up so BT can operate independent of Wi-Fi. */
+&vcc_sd3 {
+	regulator-always-on; 
+};
+
+&usdhc2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_usdhc2_1>;
+	bus-width = <1>;  /* MUX SDIO for 1-bit only. */
+	no-1-8-v; /* 3.3V VIO signaling */
+	keep-power-in-suspend;
+	enable-sdio-wakeup;
+	status = "okay";
+};
+
+&usdhc3 {
+	pinctrl-names = "default", "state_100mhz", "state_200mhz";
+	pinctrl-0 = <&pinctrl_usdhc3_1>;
+	pinctrl-1 = <&pinctrl_usdhc3_1_100mhz>;
+	pinctrl-2 = <&pinctrl_usdhc3_1_200mhz>;
+	bus-width = <4>;		/* change to 4-bit SDIO */
+	cd-gpios = <&gpio2 10 GPIO_ACTIVE_HIGH>;
+	wp-gpios = <&gpio2 15 GPIO_ACTIVE_HIGH>;
+	no-1-8-v;  /* Murata --- force 3.3V VIO */
+	keep-power-in-suspend;
+	enable-sdio-wakeup;
+	vmmc-supply = <&vcc_sd3>;
+	wifi-host; /* Murata -- pull in card detect mechanism for BCMDHD driver */
+	status = "okay";
+};

@@ -1,0 +1,77 @@
+/*
+ * Copyright (C) 2014 Freescale Semiconductor, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ */
+
+/* NOTE: This DTS file is written for plugging in Murata Wi-Fi/BT EVK into SD2 slot using Murata */
+/* i.MX InterConnect Ver 1.0 Adapter with SD Card Extender plugged into SD3 slot. */
+/* This configuration supports WLAN only. For Bluetooth-enabled connection, refer to */
+/* imx6q-sabresd-murata-v2.dts configuration. This configuration forces uses to use "non-SD Card" boot method. */
+/* ==> No hardware modification to i.MX 6Quad SABRE-SD is required. */
+#include "imx6q-sabresd.dts"
+
+/ {
+	regulators {
+		/* Murata -- add wlreg_on definition. */
+		wlreg_on: fixedregulator@100 {
+			compatible = "regulator-fixed";
+			regulator-min-microvolt = <5000000>;
+			regulator-max-microvolt = <5000000>;
+			regulator-name = "wlreg_on";
+			gpio = <&gpio7 6 0>; /* Murata: WL_REG_ON: SD3_DAT2 (gpio7_6) */
+			startup-delay-us = <100>; /* WL_REG_ON needs 61 usec delay */  
+			enable-active-high;
+		};
+	};
+
+	/* Murata -- define hook for BCMDHD driver.   */
+	bcmdhd_wlan_0: bcmdhd_wlan@0 {
+		compatible = "android,bcmdhd_wlan";
+		gpio = <&gpio7 5 0>; /* WL_HOST_WAKE: SD3_DAT1 (gpio7_5) */
+		wlreg_on-supply = <&wlreg_on>;
+	};
+};
+
+&iomuxc {
+	imx6q-sabresd-murata-v1_sdext {
+		/* Murata -- add MUXing entry for SD3 control pins: WL_REG_ON, BT_REG_ON, and WL_HOST_WAKE. */
+		pinctrl_usdhc3_1: usdhc3grp-1 {
+			fsl,pins = <
+				MX6QDL_PAD_SD3_CMD__SD3_CMD		0x17059
+				MX6QDL_PAD_SD3_CLK__SD3_CLK		0x10059
+				MX6QDL_PAD_SD3_DAT0__SD3_DATA0		0x17059
+				MX6QDL_PAD_SD3_DAT1__GPIO7_IO05		0x13069 /* WL_HOST_WAKE */
+				MX6QDL_PAD_SD3_DAT2__GPIO7_IO06		0x13069 /* WL_REG_ON */
+				MX6QDL_PAD_SD3_DAT3__GPIO7_IO07		0x13069 /* BT_REG_ON */
+			>;
+		};
+	}; 
+};
+
+&usdhc2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_usdhc2>;
+	bus-width = <4>; /* Only need 4-bit SDIO bus */
+	cd-gpios = <&gpio2 2 0>;
+	wp-gpios = <&gpio2 3 0>;
+	no-1-8-v;
+	keep-power-in-suspend;
+	enable-sdio-wakeup;
+	wifi-host; /* Murata -- pull in card detect mechanism for BCMDHD driver */
+	status = "okay";
+};
+
+&usdhc3 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_usdhc3_1>;
+	bus-width = <1>; /* 1-bit SDIO so SD3_DAT1/2/3 can be used for control signals */
+	cd-gpios = <&gpio2 0 0>;
+	wp-gpios = <&gpio2 1 0>;
+	no-1-8-v;
+	keep-power-in-suspend;
+	enable-sdio-wakeup;
+	status = "okay";
+};

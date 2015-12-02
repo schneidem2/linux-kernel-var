@@ -1,0 +1,86 @@
+/*
+ * Copyright (C) 2014 Freescale Semiconductor, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ */
+
+/* NOTE: This DTS file is written for plugging in Murata Wi-Fi/BT EVK into SD2 slot using Murata */
+/* i.MX InterConnect Ver 2.0 Adapter & connecting Bluetooth UART & control signals via ribbon cable. */
+/* This configuration supports both WLAN and Bluetooth. WL_REG_ON/BT_REG_ON/WL_HOST_WAKE are connected */
+/* via ribbon cable (J13 connector on board). 
+/* ==> Hardware modification is required. Refer to Murata Hardware User Manual. */
+#include "imx6dl-sabresd.dts"
+
+/ {
+	regulators {
+		/* Murata -- add wlreg_on definition */
+		wlreg_on: fixedregulator@100 {
+			compatible = "regulator-fixed";
+			regulator-min-microvolt = <5000000>;
+			regulator-max-microvolt = <5000000>;
+			regulator-name = "wlreg_on";
+			gpio = <&gpio4 7 0>; /* Murata: WL_REG_ON = KEY_ROW0 */
+			startup-delay-us = <100>; /* WL_REG_ON needs 61 usec delay */  
+			enable-active-high;	
+		};
+	};
+
+	/* Murata -- define hook for BCMDHD driver.   */
+	bcmdhd_wlan_0: bcmdhd_wlan@0 {
+		compatible = "android,bcmdhd_wlan";
+		/* WL_HOST_WAKE: KEY_COL0 (gpio4_6) */
+		gpio = <&gpio4 6 0>;
+		wlreg_on-supply = <&wlreg_on>;
+	};
+};
+
+&iomuxc {
+	imx6qdl-sabresd-murata-v2 {
+		/* Murata -- add MUXing entry for SD2 4-bit interface and configure control pins */
+		pinctrl_usdhc2_1: usdhc2grp-1 {
+			fsl,pins = <
+				MX6QDL_PAD_SD2_CMD__SD2_CMD		0x17059
+				MX6QDL_PAD_SD2_CLK__SD2_CLK		0x10059
+				MX6QDL_PAD_SD2_DAT0__SD2_DATA0		0x17059
+				MX6QDL_PAD_SD2_DAT1__SD2_DATA1		0x17059
+				MX6QDL_PAD_SD2_DAT2__SD2_DATA2		0x17059
+				MX6QDL_PAD_SD2_DAT3__SD2_DATA3		0x17059
+				MX6QDL_PAD_KEY_ROW0__GPIO4_IO07		0x13069	/* WL_REG_ON */
+//				MX6QDL_PAD_GPIO_2__KEY_ROW6 		0x13069	/* BT_REG_ON -- do not MUX */
+ 				MX6QDL_PAD_KEY_COL0__GPIO4_IO06 	0x13069	/* WL_HOST_WAKE */
+			>;
+		};
+	}; 
+};
+
+/* Bluetooth UART connection */
+&uart5 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_uart5_1>;
+	fsl,uart-has-rtscts;
+	status = "okay";
+	/* for DTE mode, add below change */
+	/* fsl,dte-mode; */
+	/* pinctrl-0 = <&pinctrl_uart5dte_1>; */
+};
+
+/* Disable ecspi1 interface to avoid MUXing conflict on KEY_ROW0 (WL_REG_ON) and KEY_COL0 (WL_HOST_WAKE) pins */
+&ecspi1 {
+	status = "disabled";
+};
+
+/* SD2 Wi-Fi SDIO interface. Added MUXing option in imx6qdl-sabresd.dtsi.  */
+&usdhc2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_usdhc2_1>;
+	bus-width = <4>;
+	cd-gpios = <&gpio2 2 0>;
+	wp-gpios = <&gpio2 3 0>;
+	no-1-8-v;
+	keep-power-in-suspend;
+	enable-sdio-wakeup;
+	wifi-host; 
+	status = "okay";
+};

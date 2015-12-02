@@ -1,0 +1,151 @@
+/*
+ * Copyright (C) 2014-2015 Freescale Semiconductor, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ */
+
+/* NOTE: This DTS file is written for plugging in Murata Wi-Fi/BT EVK into Slot SD2 */
+/* and using Murata i.MX InterConnect Ver 2.0 Adapter. Bluetooth UART and control signals */
+/* are connected via J19 ribbon cable connector.  i.MX 6SoloX default configuration provides */
+/* BT_REG_ON on J19.  WL_REG_ON and (optionally) WL_HOST_WAKE need to be added (reworked). */ 
+/* Please reference Murata Hardware User Guide for suggested rework. */
+#include "imx6sx-sdb.dts"
+
+/ {
+	regulators {
+		/* Murata -- add wlreg_on definition */
+		wlreg_on: fixedregulator@100 {
+			compatible = "regulator-fixed";
+			regulator-min-microvolt = <5000000>;
+			regulator-max-microvolt = <5000000>;
+			regulator-name = "wlreg_on";
+			gpio = <&gpio7 8 0>; /* WL_REG_ON: SD3_DAT6 -- gpio7_8  (requires rework - see Note above) */
+			startup-delay-us = <100>; /* WL_REG_ON needs 61 usec delay */ 
+			enable-active-high;
+		};
+	};
+
+	/* Murata -- define hook for BCMDHD driver.   */
+	/* Suggested GPIO's for WL_HOST_WAKE - See Note above. */
+	bcmdhd_wlan_0: bcmdhd_wlan@0 {
+		compatible = "android,bcmdhd_wlan";
+		/* OOB_IRQ: SD3_DAT7 (gpio7_9) requires rework - see Note above */
+		gpio = <&gpio7 9 0>; 
+		wlreg_on-supply = <&wlreg_on>;
+	};
+};
+
+
+&iomuxc {
+	imx6sx-sdb-murata-v2 {
+		/* Murata -- UART already MUXed for Ver 2.0 Adapter */
+		/* Murata -- add BT_REG_ON define/MUX here -> GPIO #106 */
+		pinctrl_uart5_1: uart5grp-1 {
+			fsl,pins = <
+				MX6SX_PAD_KEY_ROW3__UART5_RX		0x1b0b1
+				MX6SX_PAD_KEY_COL3__UART5_TX		0x1b0b1
+				MX6SX_PAD_KEY_ROW2__UART5_CTS_B		0x1b0b1
+				MX6SX_PAD_KEY_COL2__UART5_RTS_B		0x1b0b1
+				MX6SX_PAD_NAND_DATA06__GPIO4_IO_10	0x13069
+			>;
+		};
+
+		/* Murata -- MUXing for WLAN interface. */
+		pinctrl_usdhc2_1: usdhc2grp-1 {
+			fsl,pins = <
+				MX6SX_PAD_SD2_CMD__USDHC2_CMD		0x17059
+				MX6SX_PAD_SD2_CLK__USDHC2_CLK		0x10059
+				MX6SX_PAD_SD2_DATA0__USDHC2_DATA0	0x17059
+				MX6SX_PAD_SD2_DATA1__USDHC2_DATA1	0x17059
+				MX6SX_PAD_SD2_DATA2__USDHC2_DATA2	0x17059
+				MX6SX_PAD_SD2_DATA3__USDHC2_DATA3	0x17059
+			>;
+		};
+
+		pinctrl_usdhc3_1: usdhc3grp-1 {
+			fsl,pins = <
+				MX6SX_PAD_SD3_CMD__USDHC3_CMD		0x17069
+				MX6SX_PAD_SD3_CLK__USDHC3_CLK		0x10071
+				MX6SX_PAD_SD3_DATA0__USDHC3_DATA0	0x17069
+				MX6SX_PAD_SD3_DATA1__USDHC3_DATA1	0x17069
+				MX6SX_PAD_SD3_DATA2__USDHC3_DATA2	0x17069
+				MX6SX_PAD_SD3_DATA3__USDHC3_DATA3	0x17069
+				MX6SX_PAD_SD3_DATA4__GPIO7_IO_6		0x13069 /* not used */
+				MX6SX_PAD_SD3_DATA5__GPIO7_IO_7		0x13069 /* not used */
+				MX6SX_PAD_SD3_DATA6__GPIO7_IO_8		0x13069 /* Murata - WL_REG_ON */
+				MX6SX_PAD_SD3_DATA7__GPIO7_IO_9		0x13069 /* Murata - WL_HOST_WAKE */
+				MX6SX_PAD_KEY_COL0__GPIO2_IO_10		0x17059 /* CD */
+				MX6SX_PAD_KEY_ROW0__GPIO2_IO_15		0x17059 /* WP */
+			>;
+		};
+
+		pinctrl_usdhc3_1_100mhz: usdhc3grp-1-100mhz {
+			fsl,pins = <
+				MX6SX_PAD_SD3_CMD__USDHC3_CMD		0x170b9
+				MX6SX_PAD_SD3_CLK__USDHC3_CLK		0x100b9
+				MX6SX_PAD_SD3_DATA0__USDHC3_DATA0	0x170b9
+				MX6SX_PAD_SD3_DATA1__USDHC3_DATA1	0x170b9
+				MX6SX_PAD_SD3_DATA2__USDHC3_DATA2	0x170b9
+				MX6SX_PAD_SD3_DATA3__USDHC3_DATA3	0x170b9
+				MX6SX_PAD_SD3_DATA4__GPIO7_IO_6		0x13069 /* not used */
+				MX6SX_PAD_SD3_DATA5__GPIO7_IO_7		0x13069 /* not used */
+				MX6SX_PAD_SD3_DATA6__GPIO7_IO_8		0x13069 /* Murata - WL_REG_ON */
+				MX6SX_PAD_SD3_DATA7__GPIO7_IO_9		0x13069 /* Murata - WL_HOST_WAKE */
+			>;
+		};
+
+		pinctrl_usdhc3_1_200mhz: usdhc3grp-1-200mhz {
+			fsl,pins = <
+				MX6SX_PAD_SD3_CMD__USDHC3_CMD		0x170f9
+				MX6SX_PAD_SD3_CLK__USDHC3_CLK		0x100f9
+				MX6SX_PAD_SD3_DATA0__USDHC3_DATA0	0x170f9
+				MX6SX_PAD_SD3_DATA1__USDHC3_DATA1	0x170f9
+				MX6SX_PAD_SD3_DATA2__USDHC3_DATA2	0x170f9
+				MX6SX_PAD_SD3_DATA3__USDHC3_DATA3	0x170f9
+				MX6SX_PAD_SD3_DATA4__GPIO7_IO_6		0x13069 /* not used */
+				MX6SX_PAD_SD3_DATA5__GPIO7_IO_7		0x13069 /* not used */
+				MX6SX_PAD_SD3_DATA6__GPIO7_IO_8		0x13069 /* Murata - WL_REG_ON */
+				MX6SX_PAD_SD3_DATA7__GPIO7_IO_9		0x13069 /* Murata - WL_HOST_WAKE */
+			>;
+		};
+	}; 
+};
+
+&uart5 { /* Murata - for Bluetooth UART connection. */
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_uart5_1>;
+	fsl,uart-has-rtscts;
+	status = "okay";
+	/* for DTE mode, add below change */
+	/* fsl,dte-mode;*/
+	/* pinctrl-0 = <&pinctrl_uart5dte_1>; */
+};
+
+/* Redefine SD2 slot. Remove default "non-removable" descriptor and add "wi-fi host". */
+&usdhc2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_usdhc2_1>;
+	bus-width = <4>;
+	no-1-8-v;
+	keep-power-in-suspend;
+	enable-sdio-wakeup;
+	wifi-host;	/* For use with Murata Adapter Ver 2.0 */
+	status = "okay";
+};
+
+&usdhc3 {
+	pinctrl-names = "default", "state_100mhz", "state_200mhz";
+	pinctrl-0 = <&pinctrl_usdhc3_1>;
+	pinctrl-1 = <&pinctrl_usdhc3_1_100mhz>;
+	pinctrl-2 = <&pinctrl_usdhc3_1_200mhz>;
+	bus-width = <4>; /* Murata -- change to 4-bit SDIO; need upper SD bits for GPIO's on Ver 2.0 Adapter */
+	cd-gpios = <&gpio2 10 GPIO_ACTIVE_HIGH>;
+	wp-gpios = <&gpio2 15 GPIO_ACTIVE_HIGH>;
+	no-1-8-v;  /* Murata --- force 3.3V for VIO -- GPIO signaling going to Murata WLAN/BT */
+	keep-power-in-suspend;
+	enable-sdio-wakeup;
+	vmmc-supply = <&vcc_sd3>;
+	status = "okay";
+};

@@ -164,6 +164,8 @@ dtb-$(CONFIG_ARCH_MXC) += \
 	imx6dl-sabresd-ldo.dtb \
 	imx6dl-sabresd-pf200.dtb \
 	imx6dl-sabresd-hdcp.dtb \
+	imx6dl-sabresd-murata-v1_sdext.dtb \
+	imx6dl-sabresd-murata-v2.dtb \
 	imx6dl-wandboard.dtb \
 	imx6q-arm2.dtb \
 	imx6q-cubox-i.dtb \
@@ -183,6 +185,8 @@ dtb-$(CONFIG_ARCH_MXC) += \
 	imx6q-sabresd-uart.dtb \
 	imx6q-sabresd-hdcp.dtb \
 	imx6q-sabresd-ldo.dtb \
+	imx6q-sabresd-murata-v1_sdext.dtb \
+	imx6q-sabresd-murata-v2.dtb \
 	imx6q-sbc6x.dtb \
 	imx6q-udoo.dtb \
 	imx6q-wandboard.dtb \
@@ -191,6 +195,7 @@ dtb-$(CONFIG_ARCH_MXC) += \
 	imx6sl-evk-ldo.dtb \
 	imx6sl-evk-pf200.dtb \
 	imx6sl-evk-uart.dtb \
+	imx6sl-evk-murata-v1_sdext.dtb \
 	imx6sx-17x17-arm2.dtb \
 	imx6sx-17x17-arm2-ldo.dtb \
 	imx6sx-17x17-arm2-ecspi.dtb \
@@ -214,6 +219,8 @@ dtb-$(CONFIG_ARCH_MXC) += \
 	imx6sx-sabreauto.dtb \
 	imx6sx-sabreauto-m4.dtb \
 	imx6sx-sdb-lcdif1.dtb \
+	imx6sx-sdb-murata-v1_sdext.dtb \
+	imx6sx-sdb-murata-v2.dtb \
 	imx6ul-14x14-lpddr2-arm2.dtb \
 	imx6ul-14x14-ddr3-arm2.dtb \
 	imx6ul-14x14-ddr3-arm2-adc.dtb \
@@ -230,6 +237,7 @@ dtb-$(CONFIG_ARCH_MXC) += \
 	imx6ul-var-dart-sd_emmc.dtb \
 	imx6ul-14x14-evk.dtb \
 	imx6ul-14x14-evk-csi.dtb \
+	imx6ul-14x14-evk-murata-v2.dtb \
 	imx6ul-9x9-evk.dtb \
 	imx6ul-9x9-evk-ldo.dtb \
 	imx6ul-9x9-evk-csi.dtb \
