@@ -16,7 +16,20 @@
 #include "imx6ul.dtsi"
 
 / {
-	model = "Variscite i.MX6 UltraLite DART";
+#ifdef NAND
+#ifdef WIFI
+	model = "Variscite i.MX6 UltraLite DART NAND/WIFI";
+#else
+	model = "Variscite i.MX6 UltraLite DART NAND/SD";
+#endif
+#endif
+#ifdef EMMC
+#ifdef WIFI
+	model = "Variscite i.MX6 UltraLite DART EMMC/WIFI";
+#else
+	model = "Variscite i.MX6 UltraLite DART EMMC/SD";
+#endif
+#endif
 	compatible = "fsl,imx6ul-var-dart", "fsl,imx6ul";
 
 	chosen {
