@@ -67,15 +67,17 @@
 
 #ifdef WIFI
 		/* Murata -- add wlreg_on definition */
+#if 0
 		wlreg_on: fixedregulator@100 {
 			compatible = "regulator-fixed";
 			regulator-min-microvolt = <3300000>;
 			regulator-max-microvolt = <3300000>;
 			regulator-name = "wlreg_on";
-			gpio = <&gpio5 6 0>; /* WL_REG_ON: SNVS_TAMPER1 (gpio5_1) */
-			startup-delay-us = <100>; /* WL_REG_ON needs 61 usec delay */ 
+			gpio = <&gpio5 6 0>; 			/* WL_REG_ON: SNVS_TAMPER1 (gpio5_6) */
+			startup-delay-us = <100>; 		/* WL_REG_ON needs 61 usec delay */ 
 			enable-active-high;
 		};
+#endif
 
 /* force VMMC1 to always on so BT can operate independently of Wi-Fi */
 		reg_sd1_vmmc: regulator@1 {
@@ -112,7 +114,8 @@
 		compatible = "android,bcmdhd_wlan";
 		/* WL_HOST_WAKE: ENET2_RX_ER (gpio5_01) */
 		bcmdhd_wlan_irq = <&gpio5 1 0>;
-		wlreg_on-supply = <&wlreg_on>;
+		wlreg_on-supply = <&reg_sd1_vmmc>;
+		
 	};
 
 	btwilink {
@@ -210,7 +213,7 @@
 	display = <&display0>;
 	status = "okay";
 
-	display0: display {
+       display0: display {
 		bits-per-pixel = <16>;
 		bus-width = <24>;
 
@@ -299,12 +302,13 @@
 	pinctrl-0 = <&pinctrl_usdhc1>;
 	pinctrl-1 = <&pinctrl_usdhc1_100mhz>;
 	pinctrl-2 = <&pinctrl_usdhc1_200mhz>;
-	cd-gpios = <&gpio4 19 0>;
+//	cd-gpios = <&gpio4 19 0>;
 	no-1-8-v; /* Murata -- fix VIO at 3.3V */
 	keep-power-in-suspend;
 	enable-sdio-wakeup;
 	vmmc-supply = <&reg_sd1_vmmc>; 
 	wifi-host; /* Murata -- add hook for SD card detect mechanism */
+	non-removable;
 	status = "okay";
 };
 #else
@@ -531,8 +535,8 @@
 
 		pinctrl_uart3: uart3grp {
 			fsl,pins = <
-				MX6UL_PAD_UART3_TX_DATA__UART3_DCE_TX	0x1b0b1
-				MX6UL_PAD_UART3_RX_DATA__UART3_DCE_RX	0x1b0b1
+                                MX6UL_PAD_UART3_TX_DATA__UART3_DCE_TX   0x1b0b1
+                                MX6UL_PAD_UART3_RX_DATA__UART3_DCE_RX   0x1b0b1
 				MX6UL_PAD_UART3_CTS_B__UART3_DCE_CTS	0x1b0b1
 				MX6UL_PAD_UART3_RTS_B__UART3_DCE_RTS	0x1b0b1
 			>;
