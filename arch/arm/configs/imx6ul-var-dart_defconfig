@@ -1770,7 +1770,7 @@ CONFIG_SPI_IMX=y
 #
 # SPI Protocol Masters
 #
-# CONFIG_SPI_SPIDEV is not set
+CONFIG_SPI_SPIDEV=y
 # CONFIG_SPI_TLE62X0 is not set
 # CONFIG_HSI is not set
 
@@ -3137,7 +3137,7 @@ CONFIG_RTC_INTF_DEV_UIE_EMUL=y
 #
 # I2C RTC drivers
 #
-# CONFIG_RTC_DRV_DS1307 is not set
+CONFIG_RTC_DRV_DS1307=y
 # CONFIG_RTC_DRV_DS1374 is not set
 # CONFIG_RTC_DRV_DS1672 is not set
 # CONFIG_RTC_DRV_DS3232 is not set
