@@ -385,8 +385,12 @@ void __init imx6_enet_mac_init(const char *compatible)
 
 		from = enet_np;
 
-		if (of_get_mac_address(enet_np))
-			goto put_enet_node;
+/*
+Bugfix: This code prevents second MAC of 6UL to run
+*/
+		if (i==0) 
+			if (of_get_mac_address(enet_np))
+				goto put_enet_node;
 
 		ocotp_np = of_find_compatible_node(NULL, NULL, "fsl,imx6q-ocotp");
 		if (!ocotp_np) {
