@@ -345,27 +345,37 @@
 	
 	partition@0 {
 		label = "spl";
-		reg = <0x00000000 0x00200000>;
+		reg = <0x00000000 0x00200000>; // Size: 2097152 bytes = 2MBytes, Offset: 0
 	};
 
 	partition@1 {
 		label = "uboot";
-		reg = <0x00200000 0x00200000>;
+		reg = <0x00200000 0x00200000>; // Size: 2097152 bytes = 2MBytes, Offset: 2MBytes
 	};
 
 	partition@2 {
 		label = "uboot-env";
-		reg = <0x00400000 0x00200000>;
+		reg = <0x00400000 0x00200000>; // Size: 2097152 bytes = 2MBytes, Offset: 4Mbytes
 	};
 
 	partition@3 {
 		label = "kernel";
-		reg = <0x00600000 0x00800000>;
+		reg = <0x00600000 0x00800000>; // Size: 2097152 bytes = 2MBytes, Offset: 6Mbytes
 	};
 
 	partition@4 {
-		label = "rootfs";
-		reg = <0x00e00000 0x3f200000>;
+		label = "rootfs1";
+		reg = <0x01000000 0x08000000>; // Size: 0x08000000 = 134217728 bytes = 128MBytes, Offset: 16Mbytes
+	};
+	
+	partition@5 {
+		label = "rootfs2";
+		reg = <0x09000000 0x08000000>; // Size: 0x08000000 = 134217728 bytes = 128MBytes, Offset: 144Mbytes
+	};
+	
+	partition@6 {
+		label = "data";
+		reg = <0x00e00000 0x3f200000>; // Size: 0x0F000000 = 251658240 bytes = 240MBytes, Offset: 272Mbytes
 	};
 };
 
