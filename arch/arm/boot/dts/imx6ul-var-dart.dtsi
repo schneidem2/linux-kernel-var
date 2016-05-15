@@ -364,12 +364,12 @@
 	};
 
 	partition@4 {
-		label = "rootfs1";
+		label = "rootfs";
 		reg = <0x01000000 0x08000000>; // Size: 0x08000000 = 134217728 bytes = 128MBytes, Offset: 16Mbytes
 	};
 	
 	partition@5 {
-		label = "rootfs2";
+		label = "rootfs";
 		reg = <0x09000000 0x08000000>; // Size: 0x08000000 = 134217728 bytes = 128MBytes, Offset: 144Mbytes
 	};
 	
