@@ -149,7 +149,7 @@
 	assigned-clock-rates = <632217600>,<688128000>;
 };
 
-#if FEC1_CONNECTED
+#ifdef FEC1_CONNECTED
 &fec1 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_enet1>;
