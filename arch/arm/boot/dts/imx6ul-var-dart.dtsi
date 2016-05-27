@@ -149,7 +149,6 @@
 	assigned-clock-rates = <632217600>,<688128000>;
 };
 
-#ifdef FEC1_CONNECTED
 &fec1 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_enet1>;
@@ -183,27 +182,7 @@
 		};
 	};
 };
-#else
-&fec2 {
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_enet2>;
-	phy-mode = "rmii";
-	phy-handle = <&ethphy0>;
-	phy-reset-gpios=<&gpio1 10 1>;
-	phy-reset-duration=<100>;
-	status = "okay";
-	mdio {
-		#address-cells = <1>;
-		#size-cells = <0>;
 
-		ethphy0: ethernet-phy@3 {
-			compatible = "ethernet-phy-ieee802.3-c22";
-			reg = <3>;
-		};
-	};
-};
-
-#endif
 &flexcan1 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_flexcan1>;
