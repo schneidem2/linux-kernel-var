@@ -430,21 +430,10 @@
 #endif
 
 &i2c1 {
-//#ifdef VARISCITE_CARRIER
-//	clock-frequency = <400000>;
-//#else	
-	clock_frequency = <100000>;
-#endif	
+	clock-frequency = <400000>;
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_i2c1>;
 	status = "disable";
-#ifdef APM_CARRIER
-    /* DS1307 RTC module */
-    rtc@0x68 {
-             compatible = "dallas,ds1307";
-             reg = <0x68>;
-    };
-#endif    
 };
 
 &i2c2 {
@@ -452,8 +441,7 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_i2c2>;
 	status = "okay";
-
-//#ifdef VARISCITE_CARRIER	
+#ifdef VARISCITE_AUDIO_CODEC
 	codec: wm8731@1a {
 		compatible = "wlf,wm8731";
 		reg = <0x1a>;
@@ -461,7 +449,8 @@
 		clocks = <&clks IMX6UL_CLK_SAI2>, <&clks IMX6UL_CLK_PLL4_AUDIO_DIV>;
 		clock-names = "mclk","pll4";
 	};
-
+#endif	
+#ifdef VARISCITE_TOUCH
 	ft5x06_ts@38 {
 			compatible = "focaltech,5x06";
 			reg = <0x38>;
@@ -489,13 +478,12 @@
 			focaltech,mirror_h;
 			focaltech,mirror_v;
 		};
-
+#endif
         /* DS1307 RTC module */
         rtc@0x68 {
                  compatible = "dallas,ds1307";
                  reg = <0x68>;
         };
-//#endif
 };
 
 &iomuxc {
