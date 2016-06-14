@@ -142,7 +142,7 @@ CONFIG_USB_USBNET=m
 CONFIG_USB_NET_CDC_EEM=m
 CONFIG_BCMDHD=m
 CONFIG_BCMDHD_SDIO=y
-CONFIG_BCMDHD_FW_PATH="/lib/firmware/bcm/fw_bcmdhd_apsta.bin"
+CONFIG_BCMDHD_FW_PATH="/lib/firmware/bcm/fw_bcmdhd.bin"
 CONFIG_BCMDHD_NVRAM_PATH="/lib/firmware/bcm/bcmdhd.cal"
 # CONFIG_INPUT_MOUSEDEV is not set
 # CONFIG_INPUT_KEYBOARD is not set
