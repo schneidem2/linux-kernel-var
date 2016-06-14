@@ -430,10 +430,17 @@
 #endif
 
 &i2c1 {
-	clock-frequency = <400000>;
+	clock-frequency = <100000>;
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_i2c1>;
-	status = "disable";
+	status = "okay";
+
+    /* DS1307 RTC module */
+    rtc@0x68 {
+             compatible = "dallas,ds1307";
+             reg = <0x68>;
+    };
+	
 };
 
 &i2c2 {
@@ -479,11 +486,13 @@
 			focaltech,mirror_v;
 		};
 #endif
+#ifdef VARISCITE_RTC
         /* DS1307 RTC module */
         rtc@0x68 {
                  compatible = "dallas,ds1307";
                  reg = <0x68>;
         };
+#endif        
 };
 
 &iomuxc {
@@ -682,8 +691,8 @@
 
 		pinctrl_i2c1: ii2c1grp {
 			fsl,pins = <
-				MX6UL_PAD_UART4_TX_DATA__I2C1_SCL 0x4001b8b0
-				MX6UL_PAD_UART4_RX_DATA__I2C1_SDA 0x4001b8b0
+				MX6UL_PAD_CSI_PIXCLK__I2C1_SCL 0x4001b8b0
+				MX6UL_PAD_CSI_MCLK__I2C1_SDA 0x4001b8b0
 			>;
 		};
 
