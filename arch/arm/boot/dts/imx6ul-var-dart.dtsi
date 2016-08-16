@@ -439,8 +439,12 @@
     rtc@0x68 {
              compatible = "dallas,ds1307";
              reg = <0x68>;
+	};             
+    /* MPL3115A2 Precision Altimeter */
+    mpl3115@0x60 {
+             compatible = "freescale,mpl3115";
+             reg = <0x60>;
     };
-	
 };
 
 &i2c2 {
